@@ -43,7 +43,7 @@ function guardarNombre(nombreRecibido) {
 
 // Function to request a photo from the user
 function solicitarFoto(chatId) {
-  client.sendMessage(chatId,'¡Ahora envíame una foto!');
+  client.sendMessage(chatId,'¡Ahora envíame una foto de tu cara!');
   estaEsperandoFoto = true;
   estaEsperandoNombre = false;
 }
@@ -60,11 +60,13 @@ function guardarFoto(nombreFoto,media,chatId) {
     console.log('Foto guardada como:', nombreFoto + '.jpg');
     estaEsperandoFoto = false;
     estaEsperandoNombre = true;
+    status = false;
   } else {
     console.error('Error al guardar la foto: Media is undefined.');
     client.sendMessage(chatId,'¡No se recibió ninguna foto!');
     estaEsperandoFoto = false;
     estaEsperandoNombre = true;
+    status = false;
     
   }
 }
@@ -105,7 +107,7 @@ client.on('message_create', async (message) => {
         await message.reply('Lo siento, no reconozco ese comando. Intenta con "!ayuda" para obtener ayuda.');
     }
   }
-  if (status == true && message.body.startsWith('!') == false){
+  if (status == true || message.body.startsWith('!') == false){
     console.log(23,estaEsperandoFoto,estaEsperandoNombre);
     if(estaEsperandoNombre == true){
       nombre = guardarNombre(message.body);
@@ -120,9 +122,11 @@ client.on('message_create', async (message) => {
       solicitarFoto(chatId)
       guardarFoto(nombre,media,chatId)
       console.log(1);
-      status = false;
+      
     }
-  }}
+  }}else{
+    console.log('Client: ', message.body);
+  }
 });
 
 // Start the client
