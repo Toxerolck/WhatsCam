@@ -2,6 +2,10 @@ const fs = require('fs');
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const path = require('path');
+const { exec } = require('child_process'); // Usar cmd  
+const venvPath = path.join(__dirname, '.venv', 'Scripts', 'python.exe'); //Es para ejecutar con determinado venv
+const scriptPath = path.join(__dirname, 'main.py');
+const command = `"${venvPath}" "${scriptPath}"`;
 // WhatsApp client setup
 
 const client = new Client({
@@ -50,8 +54,9 @@ function guardarFoto(nombreFoto, media, chatId) {
             // Agregar nuevos datos de usuario
             var newUserData = {
                 name: nombreFoto,
-                photoFile: fileName,
+                photoFile: imagePath,
                 history: [],
+                encoding : null,
             };
             userData.users.push(newUserData);
 
@@ -59,14 +64,20 @@ function guardarFoto(nombreFoto, media, chatId) {
             fs.writeFileSync(jsonFilePath, JSON.stringify(userData, null, 2));
             console.log('Foto y datos guardados:', fileName);
             client.sendMessage(chatId,'¡Foto guardada correctamente!');
-
-            // Restablecer el estado de la conversación para el próximo usuario
-
+            exec(command, (error, stdout, stderr) => {
+                if (error) {
+                  console.error(`Error al ejecutar el script de Python: ${error.message}`);
+                  return;
+                }
+                if (stderr) {
+                  console.error(`Error en el script de Python: ${stderr}`);
+                  return;
+                }
+                console.log(`Salida del script de Python: ${stdout}`);
+              });
         } catch (error) {
             console.error('Error al guardar la foto o los datos:', error);
             client.sendMessage(chatId, '¡Hubo un error al procesar tu foto! Por favor, intenta de nuevo.');
-
-            // Restablecer el estado de la conversación en caso de error
 
         }
     } else {
@@ -97,7 +108,7 @@ client.on('qr', (qr) => {
 
 client.on('message_create', async (message) => {
     const chatId = message.from;
-    if (chatId !== '573115340656@c.us') { // Exclude your own number
+    if (chatId !== '573013252282@c.us') { // Exclude your own number
         console.log(message.body);
 
         // Command handling
@@ -144,3 +155,28 @@ client.on('message_create', async (message) => {
 
 // Initialize the client
 client.initialize();
+/*
+// runPython.js
+const { exec } = require('child_process');
+const path = require('path');
+
+// Ruta al entorno virtual y al script de Python
+const venvPath = path.join(__dirname, 'venv', 'Scripts', 'python.exe');
+const scriptPath = path.join(__dirname, 'main.py');
+
+// Comando para ejecutar el script de Python usando el entorno virtual
+
+
+// Ejecutar el comando
+exec(command, (error, stdout, stderr) => {
+  if (error) {
+    console.error(`Error al ejecutar el script de Python: ${error.message}`);
+    return;
+  }
+  if (stderr) {
+    console.error(`Error en el script de Python: ${stderr}`);
+    return;
+  }
+  console.log(`Salida del script de Python: ${stdout}`);
+});
+*/
