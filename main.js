@@ -8,11 +8,13 @@
     }
 });*/
 
+  
 const fs = require('fs');
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const { enviarMensajeInicial, guardarNombre, solicitarFoto, guardarFoto } = require('./functions');
+const { enviarMensajeInicial, guardarNombre, solicitarFoto, guardarFoto } = require('./function');
 // WhatsApp client setup
+
 const client = new Client({
     authStrategy: new LocalAuth({
         dataPath: "sessions",
@@ -21,6 +23,7 @@ const client = new Client({
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
     }
+    
 });
 
 // Global variables
@@ -32,6 +35,7 @@ let estaEsperandoNombre = true;
 // Event listeners
 client.once('ready', () => {
     console.log('Client is ready!');
+    
 });
 
 client.on('qr', (qr) => {
@@ -64,12 +68,20 @@ client.on('message_create', async (message) => {
             if (estaEsperandoNombre == true) {
                 nombre = guardarNombre(message.body);
                 solicitarFoto(chatId);
+                estaEsperandoNombre = false;
+                estaEsperandoFoto = true;
+                console.log(1,estaEsperandoFoto,estaEsperandoNombre);
             } else if (estaEsperandoFoto == false && message.type == 'media') {
                 client.sendMessage(chatId, 'Formato erronio, envía una foto.');
+                console.log(2,estaEsperandoFoto,estaEsperandoNombre);
             } else if (estaEsperandoFoto == true) {
                 media = await message.downloadMedia();
                 solicitarFoto(chatId);
-                guardarFoto(nombre, media, chatId); 
+                guardarFoto(nombre, media, chatId);
+                estaEsperandoFoto = false;
+                estaEsperandoNombre = true;
+                status = false;
+                console.log(1,estaEsperandoFoto,estaEsperandoNombre);
             }
         }
     } else {

@@ -15,8 +15,6 @@ module.exports = {
 
     solicitarFoto: function (chatId) {
         client.sendMessage(chatId, '¡Ahora envíame una foto de tu cara!');
-        estaEsperandoFoto = true;
-        estaEsperandoNombre = false;
     },
 
     guardarFoto: function (nombreFoto, media, chatId) {
@@ -50,18 +48,13 @@ module.exports = {
                 console.log('Foto y datos guardados:', fileName);
 
                 // Reset conversation state for the next user
-                estaEsperandoFoto = false;
-                estaEsperandoNombre = true;
-                status = false;
 
             } catch (error) {
                 console.error('Error al guardar la foto o los datos:', error);
                 client.sendMessage(chatId, '¡Hubo un error al procesar tu foto! Por favor, intenta de nuevo.');
                 
                 // Reset conversation state in case of error
-                estaEsperandoFoto = false;
-                estaEsperandoNombre = true;
-                status = false;
+                
             }
         } else {
             console.error('Error al guardar la foto: No se recibió media.');
