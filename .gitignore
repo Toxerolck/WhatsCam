@@ -3,3 +3,5 @@ package-lock.json
 sessions/
 fotos/
 .vscode/
+data.json
+test.js
