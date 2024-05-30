@@ -105,10 +105,10 @@ client.once('ready', () => {
 client.on('qr', (qr) => {
     qrcode.generate(qr, { small: true });
 });
-
+// write print
 client.on('message_create', async (message) => {
     const chatId = message.from;
-    if (chatId !== '573013252282@c.us') { // Exclude your own number
+    if (chatId !== '573112624856@c.us') { // Exclude your own number
         console.log(message.body);
 
         // Command handling
