@@ -4,10 +4,9 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const path = require('path');
 const { exec } = require('child_process'); // Usar cmd  
 const venvPath = path.join(__dirname, '.venv', 'Scripts', 'python.exe'); //Es para ejecutar con determinado venv
-const scriptPath = path.join(__dirname, 'main.py');
-const command = `"${venvPath}" "${scriptPath}"`;
+const scriptPath = path.join(__dirname, 'saveFace.py');
+const command = `${venvPath} ${scriptPath}`;
 // WhatsApp client setup
-
 const client = new Client({
     authStrategy: new LocalAuth({
         dataPath: "sessions",
@@ -108,7 +107,7 @@ client.on('qr', (qr) => {
 // write print
 client.on('message_create', async (message) => {
     const chatId = message.from;
-    if (chatId !== '573112624856@c.us') { // Exclude your own number
+    if (chatId !== '573115340656@c.us') { // Exclude your own number
         console.log(message.body);
 
         // Command handling
