@@ -1,7 +1,3 @@
-Entiendo, agregaré la última parte sobre cómo contribuir al proyecto y algunas secciones adicionales para hacer la documentación más completa. Aquí tienes la versión final del `README.md`:
-
----
-
 # WhatsCam
 
 [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
@@ -86,8 +82,6 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE)
 
 Para cualquier consulta o sugerencia, puedes contactar al autor a través de:
 
-- [Email](mailto:tuemail@example.com)
-- [LinkedIn](https://www.linkedin.com/in/tuperfil)
-- [Twitter](https://twitter.com/tuusuario)
+- [Email](unnamedprofiletox@example.com)
 
 ---
