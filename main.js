@@ -5,7 +5,16 @@ const path = require('path');
 const { exec } = require('child_process'); // Usar cmd  
 const venvPath = path.join(__dirname, '.venv', 'Scripts', 'python.exe'); //Es para ejecutar con determinado venv
 const scriptPath = path.join(__dirname, 'saveFace.py');
+const scriptPatheliminate = path.join(__dirname, 'eliminatePerson.py');
 const command = `${venvPath} ${scriptPath}`;
+const command_eliminate = `${venvPath} ${scriptPatheliminate}`;
+// 2. Manejar los datos JSON
+var jsonFilePath = path.resolve(__dirname, 'userData.json');
+// Leer datos existentes o inicializar si el archivo no existe
+var userData = { users: [] };
+if (fs.existsSync(jsonFilePath)) {
+    userData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
+}
 // WhatsApp client setup
 const client = new Client({
     authStrategy: new LocalAuth({
@@ -41,14 +50,7 @@ function guardarFoto(nombreFoto, media, chatId) {
             var imagePath = path.resolve(__dirname, 'fotos', fileName);
             fs.writeFileSync(imagePath, base64Image, 'base64');
 
-            // 2. Manejar los datos JSON
-            var jsonFilePath = path.resolve(__dirname, 'userData.json');
-
-            // Leer datos existentes o inicializar si el archivo no existe
-            var userData = { users: [] };
-            if (fs.existsSync(jsonFilePath)) {
-                userData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
-            }
+            
 
             // Agregar nuevos datos de usuario
             var newUserData = {
@@ -120,6 +122,11 @@ client.on('message_create', async (message) => {
                     break;
                 case 'ayuda':
                     await message.reply('¡Este es un bot de ayuda! Puedes pedir ayuda sobre diferentes temas.');
+                    break;
+                case 'historial':
+                    break;
+                case 'eliminar':
+                    client.sendMessage(chatId, '¿Que Usuario Desea Eliminar?')
                     break;
                 default:
                     await message.reply('Lo siento, no reconozco ese comando. Intenta con "!ayuda" para obtener ayuda.');
