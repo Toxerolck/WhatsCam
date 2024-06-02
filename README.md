@@ -11,9 +11,9 @@ WhatsCam es una aplicación innovadora que combina el poder de la visión por co
 
 ## Características principales
 
-- **Captura de imágenes y video:** Utiliza tu cámara web para tomar fotos y grabar videos directamente desde WhatsApp.
+- **Captura de imágenes y video:** Utiliza tu cámara web para tomar fotos WhatsApp.
 - **Procesamiento de imágenes:** Aplica filtros, efectos y transformaciones a tus imágenes en tiempo real.
-- **Reconocimiento de objetos:** Detecta y clasifica objetos en tus imágenes y videos.
+- **Reconocimiento de objetos:** Detecta y clasifica personas en tiempo real.
 - **Integración con WhatsApp:** Comparte tus creaciones directamente en tus chats de WhatsApp.
 
 ## Cómo funciona
