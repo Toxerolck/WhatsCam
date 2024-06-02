@@ -23,7 +23,9 @@ WhatsCam utiliza una combinación de Python, OpenCV y Node.js para capturar, pro
 ## Archivos principales
 
 ### `main.js`
+
 El archivo central del bot de WhatsApp. Sus funciones incluyen:
+
 - Crear y eliminar usuarios en un archivo `.JSON`.
 - Leer el historial de entrada de cada persona.
 - Emular un navegador accediendo a [WhatsApp Web](https://web.whatsapp.com/).
@@ -31,12 +33,16 @@ El archivo central del bot de WhatsApp. Sus funciones incluyen:
 - Guardar la sesión para evitar escaneos repetidos del código QR.
 
 ### `saveFace.py`
+
 Este script:
+
 - Lee el archivo JSON y crea un archivo `.txt` con información útil para el reconocimiento facial.
 - Modifica el archivo JSON para guardar la ruta del encoding de la cara.
 
 ### `app.py`
+
 El archivo principal para el reconocimiento facial. Sus tareas incluyen:
+
 - Usar OpenCV para abrir una ventana que utiliza la cámara del sistema.
 - Leer los encodings creados por `saveFace.py` y compararlos con los frames de la cámara.
 - Verificar la identidad de la persona.
@@ -45,7 +51,7 @@ El archivo principal para el reconocimiento facial. Sus tareas incluyen:
 
 1. **Clona este repositorio:**
    ```bash
-   git clone https://github.com/Toxerolck/wb.git
+   git clone https://github.com/Toxerolck/WhatsCam
    ```
 2. **Instala las dependencias de NodeJS:**
    ```bash
