@@ -88,6 +88,6 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE)
 
 Para cualquier consulta o sugerencia, puedes contactar al autor a través de:
 
-- [Email](unnamedprofiletox@example.com)
+- [Email](unnamedprofiletox@gmail.com)
 
 ---
