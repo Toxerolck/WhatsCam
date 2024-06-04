@@ -40,6 +40,7 @@ const client = new Client({
     
 });
 //Functions
+
 function enviarMensajeInicial(chatId) {
     client.sendMessage(chatId, '¡Hola! Para empezar, dime tu nombre.');
 }
@@ -140,13 +141,12 @@ client.on('message_create', async (message) => {
                 case 'historial':
                     break;
                 case 'eliminar':
-                    for(var i = 0; i < register_names.length; i ++){
-                        client.sendMessage(chatId , `El usuario ${i + 1} es: ${register_names[i].name}`);
-                    }
-                    client.sendMessage(chatId, '¿Que Usuario Desea Eliminar?')
-                    delete_number = parseInt(message.body) - 1;
-                    console.log(delete_number);
+                    client.sendMessage(chatId, "Cual de los siguientes usuarios quiere eliminar?");
+                    register_names.forEach(user => {
+                        client.sendMessage(chatId, user.name);
+                    });
                     break;
+                      
                 default:
                     await message.reply('Lo siento, no reconozco ese comando. Intenta con "!ayuda" para obtener ayuda.');
             }

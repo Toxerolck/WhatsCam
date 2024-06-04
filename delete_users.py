@@ -1,7 +1,7 @@
 import json
 import os
 # Load data from JSON file
-with open('test.json', 'r') as f:
+with open('userData.json', 'r') as f:
     data = json.load(f)
 
 
@@ -43,7 +43,7 @@ def delete_user(name):
 while True:
     name = input("Hola\n")
     delete_user(name)
-    with open('test.json', 'w') as f:
+    with open('userData.json', 'w') as f:
         json.dump(data, f, indent=4)  # Uncomment if needed
 
 print("Data update skipped (for safety).")  # Inform user

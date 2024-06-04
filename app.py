@@ -38,7 +38,7 @@ face_names = []
 process_this_frame = True
 start_time = None  # Initialize start time for validation
 unknown_count = 0  # Counter for unknown faces
-
+start_time_unknown = None
 # Define directory to save unknown face images
 unknown_face_dir = 'unknown_faces'
 if not os.path.exists(unknown_face_dir):
@@ -69,6 +69,7 @@ while True:
             name = "Unknown"
 
             if True in matches:
+                start_time_unknown = None
                 # Check validation time
                 if start_time is None:
                     start_time = time.time()  # Start timer on first match
@@ -84,11 +85,17 @@ while True:
                     name = known_face_names[first_match_index]
 
             else:
+                start_time = None
+                if start_time_unknown is None:
+                    start_time_unknown = time.time()  # Start timer on first match
+                elapsed_time_unknown = time.time() - start_time_unknown
                 # Capture and save photo of unknown face
-                unknown_count += 1
-                filename = f"unknown_{unknown_count}.jpg"
-                cv2.imwrite(os.path.join(unknown_face_dir, filename), frame)
-                print(f"Unknown face captured and saved as {filename}")
+                if elapsed_time_unknown >= validation_time_limit:
+                    unknown_count += 1
+                    filename = f"unknown_{unknown_count}.jpg"
+                    cv2.imwrite(os.path.join(unknown_face_dir, filename), frame)
+                    print(f"Unknown face captured and saved as {filename}")
+                    start_time_unknown = None
 
             face_names.append(name)
 
