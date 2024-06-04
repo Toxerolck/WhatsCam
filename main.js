@@ -1,13 +1,15 @@
 const fs = require('fs');
+const chokidar = require('chokidar')
 const qrcode = require('qrcode-terminal');
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const path = require('path');
 const { exec } = require('child_process'); // Usar cmd  
 const venvPath = path.join(__dirname, '.venv', 'Scripts', 'python.exe'); //Es para ejecutar con determinado venv
 const scriptPath = path.join(__dirname, 'saveFace.py');
 const scriptPatheliminate = path.join(__dirname, 'eliminatePerson.py');
 const command = `${venvPath} ${scriptPath}`;
-const command_eliminate = `${venvPath} ${scriptPatheliminate}`;
+const directoryPath = './unknown_faces';
+const watcher = chokidar.watch(directoryPath);
 // 2. Manejar los datos JSON
 var jsonFilePath = path.resolve(__dirname, 'userData.json');
 // Leer datos existentes o inicializar si el archivo no existe
@@ -15,6 +17,17 @@ var userData = { users: [] };
 if (fs.existsSync(jsonFilePath)) {
     userData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
 }
+if (fs.existsSync(directoryPath)) {
+    // Get the list of files in the directory
+    const files = fs.readdirSync(directoryPath);
+  
+    // Delete each file in the directory
+    for (const file of files) {
+      const filePath = `${directoryPath}/${file}`;
+      fs.unlinkSync(filePath);
+      console.log(`Archivo eliminado: ${filePath}`);
+    }}
+register_names = userData.users;
 // WhatsApp client setup
 const client = new Client({
     authStrategy: new LocalAuth({
@@ -46,6 +59,8 @@ function guardarFoto(nombreFoto, media, chatId) {
         try {
             // 1. Guardar la imagen en el sistema de archivos
             var base64Image = media.data;
+            nombreFoto.replace(" ", "_"); // No sirve
+            console.log(nombreFoto);
             var fileName = nombreFoto + '.jpg';
             var imagePath = path.resolve(__dirname, 'fotos', fileName);
             fs.writeFileSync(imagePath, base64Image, 'base64');
@@ -109,9 +124,8 @@ client.on('qr', (qr) => {
 // write print
 client.on('message_create', async (message) => {
     const chatId = message.from;
-    if (chatId !== '573115340656@c.us') { // Exclude your own number
+    if (chatId == '573013252282@c.us') { // Exclude your own number
         console.log(message.body);
-
         // Command handling
         if (message.body.startsWith('!')) {
             const comando = message.body.slice(1).trim().split(/ +/).shift().toLowerCase();
@@ -126,13 +140,17 @@ client.on('message_create', async (message) => {
                 case 'historial':
                     break;
                 case 'eliminar':
+                    for(var i = 0; i < register_names.length; i ++){
+                        client.sendMessage(chatId , `El usuario ${i + 1} es: ${register_names[i].name}`);
+                    }
                     client.sendMessage(chatId, '¿Que Usuario Desea Eliminar?')
+                    delete_number = parseInt(message.body) - 1;
+                    console.log(delete_number);
                     break;
                 default:
                     await message.reply('Lo siento, no reconozco ese comando. Intenta con "!ayuda" para obtener ayuda.');
             }
         }
-
         // Conversation flow (using imported functions)
         if (status == true && message.body.startsWith('!') == false) {
             if (estaEsperandoNombre == true) {
@@ -159,30 +177,6 @@ client.on('message_create', async (message) => {
     }
 });
 
+  
 // Initialize the client
 client.initialize();
-/*
-// runPython.js
-const { exec } = require('child_process');
-const path = require('path');
-
-// Ruta al entorno virtual y al script de Python
-const venvPath = path.join(__dirname, 'venv', 'Scripts', 'python.exe');
-const scriptPath = path.join(__dirname, 'main.py');
-
-// Comando para ejecutar el script de Python usando el entorno virtual
-
-
-// Ejecutar el comando
-exec(command, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error al ejecutar el script de Python: ${error.message}`);
-    return;
-  }
-  if (stderr) {
-    console.error(`Error en el script de Python: ${stderr}`);
-    return;
-  }
-  console.log(`Salida del script de Python: ${stdout}`);
-});
-*/
