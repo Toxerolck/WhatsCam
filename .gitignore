@@ -8,8 +8,9 @@ test.js
 userData.json
 test.py
 boost_1_66_0/
-.venv
-unknown_faces/*
+.venv/
 eliminar.txt
 _pycache_/
 boost_1_66_0.code-workspace
+unknown_faces/*
+
