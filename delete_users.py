@@ -5,7 +5,7 @@ with open('userData.json', 'r') as f:
     data = json.load(f)
 with open('eliminar.txt', 'r') as f:
     name = f.read()
-name = "Donald Trump"
+
 def delete_user(name):
     # Access the 'users' list using a dictionary key
     users = data.get('users')  # Use .get() for safer access
