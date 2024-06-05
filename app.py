@@ -5,6 +5,7 @@ import json
 import dlib
 import os
 import time
+from datetime import datetime
 # Define validation time limit (in seconds)
 validation_time_limit = 5
 
@@ -77,12 +78,25 @@ while True:
                 # Check if validation time limit is reached
                 elapsed_time = time.time() - start_time
                 if elapsed_time >= validation_time_limit:
+                    name = known_face_names[matches.index(True)]  
                     print("Face successfully validated!")
+
+                    # Update JSON with validation timestamp
+                    with open(json_file_path, 'r') as file:
+                        data = json.load(file)
+                    for user in data['users']:
+                        if user['name'] == name:
+                            user['history'].append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                            break
+                    with open(json_file_path, 'w') as file:
+                        json.dump(data, file, indent=4)
+                    print(f"Timestamp added to history for {name}")
                     start_time = None  # Reset timer for next validation
                 else:
                     # Update name with the first matched person (consider confidence levels for multiple matches)
                     first_match_index = matches.index(True)
                     name = known_face_names[first_match_index]
+                    face_names.append(name)
 
             else:
                 start_time = None
