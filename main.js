@@ -86,9 +86,7 @@ function guardarFoto(nombreFoto, media, chatId) {
             var fileName = nombreFoto + '.jpg';
             var imagePath = path.resolve(__dirname, 'fotos', fileName);
             fs.writeFileSync(imagePath, base64Image, 'base64');
-
-            
-
+                userData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
             // Agregar nuevos datos de usuario
             var newUserData = {
                 name: nombreFoto,
@@ -164,6 +162,7 @@ client.on('message_create', async (message) => {
                 case 'eliminar':
                     client.sendMessage(chatId, "Cual de los siguientes usuarios quiere eliminar?");
                     status_delete = true;
+                    register_names = userData.users;
                     register_names.forEach(user => {
                         client.sendMessage(chatId, user.name);
                         });

@@ -2,7 +2,7 @@ import face_recognition
 import cv2
 import numpy as np
 import json
-
+import threading  # Para usar bloqueos
 # Ruta al archivo JSON
 json_file_path = 'userData.json'
 
@@ -11,6 +11,7 @@ with open(json_file_path, 'r') as file:
     data = json.load(file)
 
 # Función para encontrar y devolver el encoding de un usuario específico
+lock = threading.Lock()
 
 
 def get_user_encoding(data, user_name):
@@ -51,6 +52,12 @@ encoding_archivo = np.array(get_user_encoding(data, archivo))
 print(f"Nuevo encoding de {archivo}: {encoding_archivo}")
 
 # Guardar los cambios en el archivo JSON
-with open(json_file_path, 'w') as file:
-    json.dump(data, file, indent=4)
+with lock:  # Adquirir el bloqueo antes de modificar el JSON
+    with open(json_file_path, 'r') as file:
+        data = json.load(file)
+
+    set_user_encoding(data, archivo, encoding_path)
+
+    with open(json_file_path, 'w') as file:
+        json.dump(data, file, indent=4)
 print("Codigo ejecutado correctamente.")
