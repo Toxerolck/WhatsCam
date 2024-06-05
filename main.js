@@ -6,8 +6,9 @@ const path = require('path');
 const { exec } = require('child_process'); // Usar cmd  
 const venvPath = path.join(__dirname, '.venv', 'Scripts', 'python.exe'); //Es para ejecutar con determinado venv
 const scriptPath = path.join(__dirname, 'saveFace.py');
-const scriptPatheliminate = path.join(__dirname, 'eliminatePerson.py');
+const scriptPatheliminate = path.join(__dirname, 'delete_users.py');
 const command = `${venvPath} ${scriptPath}`;
+const command_delete = `${venvPath} ${scriptPatheliminate}`;
 const directoryPath = './unknown_faces';
 const watcher = chokidar.watch(directoryPath);
 // 2. Manejar los datos JSON
@@ -54,7 +55,27 @@ function guardarNombre(nombreRecibido) {
 function solicitarFoto(chatId) {
     client.sendMessage(chatId, '¡Ahora envíame una foto de tu cara!');
 }
-
+function eliminar(chatId, nombreRecibido){
+    console.log("Eliminar    ", nombreRecibido);
+    fs.writeFile('eliminar.txt', nombreRecibido, (err) => {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log('Archivo creado exitosamente!');
+        }
+    });
+    exec(command_delete, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error al ejecutar el script de Python: ${error.message}`);
+          return;
+        }
+        if (stderr) {
+          console.error(`Error en el script de Python: ${stderr}`);
+          return;
+        }
+        console.log(`Salida del script de Python: ${stdout}`);
+      });
+}
 function guardarFoto(nombreFoto, media, chatId) {
     if (media) {
         try {
@@ -95,7 +116,6 @@ function guardarFoto(nombreFoto, media, chatId) {
         } catch (error) {
             console.error('Error al guardar la foto o los datos:', error);
             client.sendMessage(chatId, '¡Hubo un error al procesar tu foto! Por favor, intenta de nuevo.');
-
         }
     } else {
         console.error('Error al guardar la foto: No se recibió media.');
@@ -111,6 +131,7 @@ function guardarFoto(nombreFoto, media, chatId) {
 // Global variables
 let nombre, media;
 let status = false;
+let status_delete = false;
 let estaEsperandoFoto = false;
 let estaEsperandoNombre = true;
 // Event listeners
@@ -142,9 +163,10 @@ client.on('message_create', async (message) => {
                     break;
                 case 'eliminar':
                     client.sendMessage(chatId, "Cual de los siguientes usuarios quiere eliminar?");
+                    status_delete = true;
                     register_names.forEach(user => {
                         client.sendMessage(chatId, user.name);
-                    });
+                        });
                     break;
                       
                 default:
@@ -172,9 +194,14 @@ client.on('message_create', async (message) => {
                 console.log(1,estaEsperandoFoto,estaEsperandoNombre);
             }
         }
+        if (status_delete == true && message.body.startsWith('!') == false){
+            eliminar(chatId, message.body);
+            status_delete == false;
+        }
     } else {
         console.log('Client: ', message.body);
     }
+    
 });
 
   

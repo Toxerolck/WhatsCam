@@ -3,7 +3,8 @@ import os
 # Load data from JSON file
 with open('userData.json', 'r') as f:
     data = json.load(f)
-
+with open('eliminar.txt', 'r') as f:
+    name = f.read()
 
 def delete_user(name):
     # Access the 'users' list using a dictionary key
@@ -40,10 +41,9 @@ def delete_user(name):
 
 
 # Example usage
-while True:
-    name = input("Hola\n")
-    delete_user(name)
-    with open('userData.json', 'w') as f:
-        json.dump(data, f, indent=4)  # Uncomment if needed
+
+delete_user(name)
+with open('userData.json', 'w') as f:
+    json.dump(data, f, indent=4)  # Uncomment if needed
 
 print("Data update skipped (for safety).")  # Inform user
