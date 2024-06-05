@@ -1,5 +1,4 @@
 const fs = require('fs');
-const chokidar = require('chokidar')
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const path = require('path');
@@ -10,7 +9,10 @@ const scriptPatheliminate = path.join(__dirname, 'delete_users.py');
 const command = `${venvPath} ${scriptPath}`;
 const command_delete = `${venvPath} ${scriptPatheliminate}`;
 const directoryPath = './unknown_faces';
-const watcher = chokidar.watch(directoryPath);
+const number = "3013252282";
+const usuario_number = `57${number}@c.us`;
+const watchFolder = 'unknown_faces'; // Ruta de la carpeta a observar
+var status_alert = false;
 // 2. Manejar los datos JSON
 var jsonFilePath = path.resolve(__dirname, 'userData.json');
 // Leer datos existentes o inicializar si el archivo no existe
@@ -28,6 +30,37 @@ if (fs.existsSync(directoryPath)) {
       fs.unlinkSync(filePath);
       console.log(`Archivo eliminado: ${filePath}`);
     }}
+    async function sendImage(imageUnknownPath) {
+        const imageMedia = MessageMedia.fromFilePath(imageUnknownPath);
+        try {
+            await client.sendMessage(usuario_number, imageMedia);
+            console.log('Image sent successfully!');
+        } catch (error) {
+            console.error('Error sending image:', error);
+        }
+    }
+    
+    fs.watch(watchFolder, (eventType, filename) => {
+        if (eventType === 'rename' && filename) {
+            status_alert = true;
+            var imageUnknownPath = `./${watchFolder}/${filename}`;
+            console.log(status_alert);
+            console.log(imageUnknownPath);
+    
+            // Usar setTimeout para retrasar la ejecución de sendImage
+            setTimeout(() => {
+                sendImage(imageUnknownPath)
+                    .then(() => {
+                        console.log('Image sent successfully!');
+                        status_alert = false;
+                    })
+                    .catch(err => {
+                        console.error('Error sending image:', err);
+                    });
+            }, 500); // 500ms delay
+        }
+    });
+    
 register_names = userData.users;
 // WhatsApp client setup
 const client = new Client({
@@ -51,7 +84,40 @@ function guardarNombre(nombreRecibido) {
     console.log('Nombre guardado:', nombre);
     return nombre;
 }
-
+function mostrar_historial(chatId,selectedUser){
+    fs.readFile(jsonFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error al leer el archivo JSON:', err);
+            return;
+        }
+    
+        try {
+            const userData = JSON.parse(data);
+            let userFound = false; // Variable para indicar si se encontró al usuario
+    
+            for (let i = 0; i < userData.users.length; i++) {
+                if (userData.users[i].name === selectedUser) {
+                    client.sendMessage(chatId,`\nEntradas de ${selectedUser}:`);
+                    for (let j = 0; j < userData.users[i].history.length; j++) {
+                        const date = new Date(userData.users[i].history[j]);
+                        const formattedDate = `- ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} a las ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                        console.log(formattedDate);
+                        client.sendMessage(chatId, formattedDate);
+                    }
+                    userFound = true; // Marcar que se encontró al usuario
+                    break; // Salir del bucle una vez que se encuentra al usuario
+                }
+            }
+    
+            if (!userFound) {  // Comprobar si se encontró al usuario después del bucle
+                client.searchMessages(chatId,`No se encontró el usuario "${selectedUser}"`);
+            }
+        } catch (parseError) {
+            console.error('Error al analizar el JSON:', parseError);
+        }
+    });
+    
+}
 function solicitarFoto(chatId) {
     client.sendMessage(chatId, '¡Ahora envíame una foto de tu cara!');
 }
@@ -130,6 +196,7 @@ function guardarFoto(nombreFoto, media, chatId) {
 let nombre, media;
 let status = false;
 let status_delete = false;
+let status_history = false;
 let estaEsperandoFoto = false;
 let estaEsperandoNombre = true;
 // Event listeners
@@ -144,7 +211,7 @@ client.on('qr', (qr) => {
 // write print
 client.on('message_create', async (message) => {
     const chatId = message.from;
-    if (chatId == '573013252282@c.us') { // Exclude your own number
+    if (chatId == usuario_number) { // Exclude your own number
         console.log(message.body);
         // Command handling
         if (message.body.startsWith('!')) {
@@ -155,9 +222,15 @@ client.on('message_create', async (message) => {
                     status = true;
                     break;
                 case 'ayuda':
-                    await message.reply('¡Este es un bot de ayuda! Puedes pedir ayuda sobre diferentes temas.');
+                    await message.reply('¡Este es un bot de ayuda! Puedes pedir ayuda sobre diferentes temas.\nEscribe "!" Para iniciar un comando\nComandos Disponibles: \nayuda\ncrear\nhistorial\neliminar');
                     break;
                 case 'historial':
+                    client.sendMessage(chatId, "Cual de los siguientes ver su historial de entrada?");
+                    status_history = true;
+                    register_names = userData.users;
+                    register_names.forEach(user => {
+                        client.sendMessage(chatId, user.name);
+                        });
                     break;
                 case 'eliminar':
                     client.sendMessage(chatId, "Cual de los siguientes usuarios quiere eliminar?");
@@ -195,6 +268,10 @@ client.on('message_create', async (message) => {
         }
         if (status_delete == true && message.body.startsWith('!') == false){
             eliminar(chatId, message.body);
+            status_delete == false;
+        }
+        if (status_history == true && message.body.startsWith('!') == false){
+            mostrar_historial(chatId, message.body);
             status_delete == false;
         }
     } else {
